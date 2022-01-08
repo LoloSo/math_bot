@@ -2,6 +2,8 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackContext, CallbackQueryHandler
 from openpyxl import load_workbook
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from sys import exc_info
+from traceback import extract_tb
 
 wb = load_workbook('database.xlsx')
 vendor = wb['users']
@@ -38,100 +40,187 @@ def do_start(update, context):
 def keyboard_value(update, context):
     text = update.message.text
 
-    if text == "Теория":
-        context.user_data['sort'] = 'Теория'
-        keyboard = [
-            ["Умножения двоичных чисел"],
-            ["Возведение в квадрат"],
-            ["Квадратные уравнения"]
-        ]
-        update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
+    try:
+        if text == "Теория" or text == 'Назад' and context.user_data['back'] == 'назад теория':
+            context.user_data['sort'] = 'Теория'
+            keyboard = [
+                ["Умножения двоичных чисел"],
+                ["Возведение в квадрат"],
+                ["Квадратные уравнения"]
+            ]
+            update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
-    elif text == "Практика":
-        context.user_data['sort'] = 'Практика'
-        keyboard = [
-            ["Умножения двоичных чисел"],
-            ["Возведение в квадрат"],
-            ["Квадратные уравнения"]
-        ]
-        update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
+        elif text == "Практика":
+            context.user_data['sort'] = 'Практика'
+            keyboard = [
+                ["Умножения двоичных чисел"],
+                ["Возведение в квадрат"],
+                ["Квадратные уравнения"]
+            ]
+            update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
-    if 'sort' in context.user_data:
+        if 'sort' in context.user_data:
 
-        if update.message.text != 'Теория' and context.user_data['command'] == 'Теория':
+            if update.message.text != 'Теория' and context.user_data['sort'] == 'Теория':
 
-            if text == "Умножения двоичных чисел":
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[2]':
 
-                context.user_data['sort'] = 'Теория'
-                keyboard = [
-                    ["Далее"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[3]'
+                    context.user_data['back'] = 'назад теория'
+                    context.user_data['practice'] = 'Практика умножение двоичных чисел'
+                    context.user_data['sort'] = 'Практика'
 
-            elif text == "Возведение в квадрат":
+                    keyboard = [
+                        ["Назад"],
+                        ['Практика по теме']
+                    ]
+                    update.message.reply_text(text='Умножения двоичных чисел - 3',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
 
-                context.user_data['sort'] = 'Практика'
-                keyboard = [
-                    ["Умножения двоичных чисел"],
-                    ["Возведение в квадрат"],
-                    ["Квадратные уравнения"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[1]':
 
-            elif text == "Квадратные уравнения":
+                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[2]'
 
-                context.user_data['sort'] = 'Практика'
-                keyboard = [
-                    ["Умножения двоичных чисел"],
-                    ["Возведение в квадрат"],
-                    ["Квадратные уравнения"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text='Умножения двоичных чисел - 2',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
 
-        elif update.message.text != 'Практика' and context.user_data['command'] == 'Практика':
+                if text == "Умножения двоичных чисел":
 
-            if text == "Умножения двоичных чисел":
+                    context.user_data['sort'] = 'Теория'
+                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[1]'
+                    context.user_data['back'] = 'назад теория'
 
-                context.user_data['sort'] = 'Теория'
-                keyboard = [
-                    ["Умножения двоичных чисел"],
-                    ["Возведение в квадрат"],
-                    ["Квадратные уравнения"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                    keyboard = [
+                        ["Далее"],
+                        ['Назад']
+                    ]
+                    update.message.reply_text(text='Умножения двоичных чисел - 1',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
 
-            elif text == "Возведение в квадрат":
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[2]':
 
-                context.user_data['sort'] = 'Практика'
-                keyboard = [
-                    ["Умножения двоичных чисел"],
-                    ["Возведение в квадрат"],
-                    ["Квадратные уравнения"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[3]'
+                    context.user_data['back'] = 'назад теория'
+                    context.user_data['practice'] = 'Практика возведение в квадрат'
+                    context.user_data['sort'] = 'Практика'
 
-            elif text == "Квадратные уравнения":
+                    keyboard = [
+                        ["Назад"],
+                        ['Практика по теме']
+                    ]
+                    update.message.reply_text(text='Возведение в квадрат - 3',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
 
-                context.user_data['sort'] = 'Практика'
-                keyboard = [
-                    ["Умножения двоичных чисел"],
-                    ["Возведение в квадрат"],
-                    ["Квадратные уравнения"]
-                ]
-                update.message.reply_text(text='Выберите тему',
-                                          reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                           resize_keyboard=True))
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[1]':
 
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[2]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text='Возведение в квадрат - 2',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                if text == "Возведение в квадрат":
+
+                    context.user_data['sort'] = 'Теория'
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[1]'
+                    context.user_data['back'] = 'назад теория'
+
+                    keyboard = [
+                        ["Далее"],
+                        ['Назад']
+                    ]
+                    update.message.reply_text(text='Возведение в квадрат - 1',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Квадратные уравнения[2]':
+
+                    context.user_data[context.user_data['sort']] = 'Квадратные уравнения[3]'
+                    context.user_data['back'] = 'назад теория'
+                    context.user_data['practice'] = 'Практика квадратные уравнения'
+                    context.user_data['sort'] = 'Практика'
+
+                    keyboard = [
+                        ["Назад"],
+                        ['Практика по теме']
+                    ]
+                    update.message.reply_text(text='Квадратные уравнения - 3',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Квадратные уравнения[1]':
+
+                    context.user_data[context.user_data['sort']] = 'Квадратные уравнения[2]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text='Квадратные уравнения - 2',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                if text == "Квадратные уравнения":
+
+                    context.user_data['sort'] = 'Теория'
+                    context.user_data[context.user_data['sort']] = 'Квадратные уравнения[1]'
+                    context.user_data['back'] = 'назад теория'
+
+                    keyboard = [
+                        ["Далее"],
+                        ['Назад']
+                    ]
+                    update.message.reply_text(text='Квадратные уравнения - 1',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+
+            elif update.message.text != 'Практика' and context.user_data['sort'] == 'Практика':
+
+                if text == "Умножения двоичных чисел" or text == 'Практика по теме' and context.user_data['practice'] == 'Практика умножение двоичных чисел':
+
+                    context.user_data['sort'] = 'Теория'
+                    keyboard = [
+                        ["Назад"]
+                    ]
+                    update.message.reply_text(text='Это практика',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                elif text == "Возведение в квадрат":
+
+                    context.user_data['sort'] = 'Практика'
+                    keyboard = [
+                        ["Умножения двоичных чисел"],
+                        ["Возведение в квадрат"],
+                        ["Квадратные уравнения"]
+                    ]
+                    update.message.reply_text(text='Выберите тему',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                elif text == "Квадратные уравнения":
+
+                    context.user_data['sort'] = 'Практика'
+                    keyboard = [
+                        ["Умножения двоичных чисел"],
+                        ["Возведение в квадрат"],
+                        ["Квадратные уравнения"]
+                    ]
+                    update.message.reply_text(text='Выберите тему',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+    except Exception as ex:
+        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
 
 def do_command(update, context: CallbackContext):
     if update.message.text == '/start':
@@ -239,5 +328,5 @@ def do_delete_keyword(update: Update, context):
 
     return wb.save('database.xlsx')
 
-
-main()
+if __name__ == '__main__':
+    main()
