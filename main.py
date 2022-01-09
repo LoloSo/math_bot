@@ -44,20 +44,40 @@ def do_start(update, context):
 
     keyboard = [
         ["Теория"],
-        ["Практика"]
+        ["Практика"],
+        ['Сообщить о проблеме']
     ]
 
     update.message.reply_text(text='Добро пожаловать, выберите, что бы вы хотели сделать.',
+                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
+
+def menu(update, context):
+
+    keyboard = [
+        ["Теория"],
+        ["Практика"]
+    ]
+
+    update.message.reply_text(text='Выберите, что бы вы хотели сделать.',
                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
 def keyboard_value(update: Update, context):
     text = update.message.text
 
     try:
+
+        if 'command' in context.user_data:
+            if update.message.text != 'Сообщить о проблеме' and context.user_data['command'] == '/addven':
+                do_words(update, context)
+
         if text == 'Назад':
             context.user_data['sort'] = None
             context.user_data['practice'] = None
-            do_start(update=update, context=context)
+            menu(update=update, context=context)
+            return
+
+        if text == 'Сообщить о проблеме':
+            do_command(update=update, context=context)
             return
 
         if text == "Теория" or text == 'Назад' and context.user_data['back'] == 'назад теория':
@@ -331,7 +351,7 @@ def keyboard_value(update: Update, context):
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
                         else:
-                            update.message.reply_text(text=f'Привет, давай поупражняемся!',
+                            update.message.reply_text(text=f'Итак, давай поупражняемся!',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                        resize_keyboard=True))
                     except Exception as ex:
@@ -366,7 +386,7 @@ def keyboard_value(update: Update, context):
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
                         else:
-                            update.message.reply_text(text=f'Привет, давай поупражняемся!',
+                            update.message.reply_text(text=f'Итак, давай поупражняемся!',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                        resize_keyboard=True))
                     except Exception as ex:
@@ -379,7 +399,7 @@ def keyboard_value(update: Update, context):
                     first_number = context.user_data['first_number'] = random.randint(10, 99)
                     print(f'\033[32m{first_number*first_number}')
 
-                    update.message.reply_text(text=f'{first_number} * {first_number}',
+                    update.message.reply_text(text=f'Квадрат числа: {first_number}',
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
@@ -401,7 +421,7 @@ def keyboard_value(update: Update, context):
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
                         else:
-                            update.message.reply_text(text=f'Привет, давай поупражняемся! В ответе записывай корни через пробел в любом порядке',
+                            update.message.reply_text(text=f'Итак, давай поупражняемся! В ответ запиши корни через пробел в любом порядке',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                        resize_keyboard=True))
 
@@ -444,6 +464,10 @@ def do_command(update, context: CallbackContext):
         context.user_data['command'] = update.message.text
         update.message.reply_text(text='Введите артикул:')
 
+    if update.message.text == 'Сообщить о проблеме':
+        context.user_data['command'] = '/addven'
+        update.message.reply_text(text='Опишите вашу проблему, а так же ваши действия, которые привели вас к ошибке:')
+
     elif update.message.text == '/delven':
         context.user_data['command'] = update.message.text
         update.message.reply_text(text='Введите артикул для удаления:')
@@ -461,7 +485,7 @@ def do_command(update, context: CallbackContext):
         if update.message.text != '/delven' and context.user_data['command'] == '/delven':
             do_words(update, context)
 
-        elif update.message.text != '/addven' and context.user_data['command'] == '/addven':
+        elif update.message.text != '/addven' and update.message.text != 'Сообщить о проблеме' and context.user_data['command'] == '/addven':
             do_words(update, context)
 
         elif update.message.text != '/addkey' and context.user_data['command'] == '/addkey':
@@ -500,7 +524,8 @@ def do_add_vendor(update: Update, context):
 
         if vendor.cell(column=1, row=i).value is None:
             vendor.cell(column=1, row=i).value = update.message.text
-            update.message.reply_text(text='Готово!')
+            vendor.cell(column=2, row=i).value = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+            update.message.reply_text(text='Большое спасибо, мы это исправим!')
             break
 
     return wb.save('database.xlsx')
