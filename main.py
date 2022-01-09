@@ -1,18 +1,23 @@
+import random
+
+import telegram
+
+from settings import TOKEN
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackContext, CallbackQueryHandler
 from openpyxl import load_workbook
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from sys import exc_info
 from traceback import extract_tb
+import theory_text
 
 wb = load_workbook('database.xlsx')
 vendor = wb['users']
-token = '1684008354:AAGtETeI2tgXd-AM_6AQvJmh43aTSYjkXxE'
 
 
 def main():
 
-    updater = Updater(token=token, use_context=True)
+    updater = Updater(token=TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
     handler = MessageHandler(Filters.command, do_command)
@@ -20,12 +25,20 @@ def main():
     # start_handler = CommandHandler('start', do_start)
     # help_handler = CommandHandler('help', do_help)
     keyboard_handler = MessageHandler(Filters.text, keyboard_value)
+    photo_handler = MessageHandler(Filters.photo, do_photo)
 
     dispatcher.add_handler(handler)
     dispatcher.add_handler(keyboard_handler)
+    dispatcher.add_handler(photo_handler)
 
     updater.start_polling()
     updater.idle()
+
+def do_photo(update: Update, context):
+    print('a')
+    # idp = update.message.photo.file_id
+    # print(idp)
+    update.message.reply_photo(open('4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
 
 def do_start(update, context):
 
@@ -37,16 +50,23 @@ def do_start(update, context):
     update.message.reply_text(text='Добро пожаловать, выберите, что бы вы хотели сделать.',
                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
-def keyboard_value(update, context):
+def keyboard_value(update: Update, context):
     text = update.message.text
 
     try:
+        if text == 'Назад':
+            context.user_data['sort'] = None
+            context.user_data['practice'] = None
+            do_start(update=update, context=context)
+            return
+
         if text == "Теория" or text == 'Назад' and context.user_data['back'] == 'назад теория':
             context.user_data['sort'] = 'Теория'
             keyboard = [
                 ["Умножения двоичных чисел"],
                 ["Возведение в квадрат"],
-                ["Квадратные уравнения"]
+                ["Квадратные уравнения"],
+                ["Назад"]
             ]
             update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
@@ -55,9 +75,12 @@ def keyboard_value(update, context):
             keyboard = [
                 ["Умножения двоичных чисел"],
                 ["Возведение в квадрат"],
-                ["Квадратные уравнения"]
+                ["Квадратные уравнения"],
+                ["Назад"]
             ]
             update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
+
+        check_practice = 'practice' in context.user_data
 
         if 'sort' in context.user_data:
 
@@ -74,7 +97,7 @@ def keyboard_value(update, context):
                         ["Назад"],
                         ['Практика по теме']
                     ]
-                    update.message.reply_text(text='Умножения двоичных чисел - 3',
+                    update.message.reply_text(text=theory_text.THEORY1_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
@@ -85,7 +108,10 @@ def keyboard_value(update, context):
                     keyboard = [
                         ["Далее"]
                     ]
-                    update.message.reply_text(text='Умножения двоичных чисел - 2',
+                    update.message.reply_text(text=theory_text.THEORY1_2_1,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY1_2_2,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
@@ -99,13 +125,14 @@ def keyboard_value(update, context):
                         ["Далее"],
                         ['Назад']
                     ]
-                    update.message.reply_text(text='Умножения двоичных чисел - 1',
+                    update.message.reply_text(text=theory_text.THEORY1_1,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
-                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[2]':
 
-                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[3]'
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[5]':
+
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[6]'
                     context.user_data['back'] = 'назад теория'
                     context.user_data['practice'] = 'Практика возведение в квадрат'
                     context.user_data['sort'] = 'Практика'
@@ -114,10 +141,71 @@ def keyboard_value(update, context):
                         ["Назад"],
                         ['Практика по теме']
                     ]
-                    update.message.reply_text(text='Возведение в квадрат - 3',
+                    update.message.reply_text(text=theory_text.THEORY2_6,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_6_1,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_6_2,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_6_3,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[4]':
+
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[5]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text=theory_text.THEORY2_5,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_5_1,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_5_2,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_5_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[3]':
+
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[4]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text=theory_text.THEORY2_4,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_4_2,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_4_3,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_4_4,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[2]':
+
+                    context.user_data[context.user_data['sort']] = 'Возведение в квадрат[3]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+                    update.message.reply_text(text=theory_text.THEORY2_3,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY2_3_2,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[1]':
 
                     context.user_data[context.user_data['sort']] = 'Возведение в квадрат[2]'
@@ -125,7 +213,7 @@ def keyboard_value(update, context):
                     keyboard = [
                         ["Далее"]
                     ]
-                    update.message.reply_text(text='Возведение в квадрат - 2',
+                    update.message.reply_text(text=theory_text.THEORY2_2,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
@@ -139,7 +227,10 @@ def keyboard_value(update, context):
                         ["Далее"],
                         ['Назад']
                     ]
-                    update.message.reply_text(text='Возведение в квадрат - 1',
+
+                    update.message.reply_photo(open('4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
+
+                    update.message.reply_text(text=theory_text.THEORY2_1,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
@@ -154,9 +245,28 @@ def keyboard_value(update, context):
                         ["Назад"],
                         ['Практика по теме']
                     ]
-                    update.message.reply_text(text='Квадратные уравнения - 3',
+                    update.message.reply_text(text=theory_text.THEORY3_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_3_1,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_photo(open('slide-9.jpg', 'rb'))
+                    update.message.reply_text(text=theory_text.THEORY3_3_3,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_3_4,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_3_5,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_3_6,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_3_7,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
 
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Квадратные уравнения[1]':
 
@@ -165,9 +275,19 @@ def keyboard_value(update, context):
                     keyboard = [
                         ["Далее"]
                     ]
-                    update.message.reply_text(text='Квадратные уравнения - 2',
+                    update.message.reply_text(text=theory_text.THEORY3_2,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_2_1,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_photo(open('diskriminant-i-korni-kvadratnogo-uravneniya.png', 'rb'))
+                    update.message.reply_text(text=theory_text.THEORY3_2_3,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
+                    update.message.reply_text(text=theory_text.THEORY3_2_4,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
 
                 if text == "Квадратные уравнения":
 
@@ -179,46 +299,139 @@ def keyboard_value(update, context):
                         ["Далее"],
                         ['Назад']
                     ]
-                    update.message.reply_text(text='Квадратные уравнения - 1',
+                    update.message.reply_text(text=theory_text.THEORY3_1,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
+                    update.message.reply_text(text=theory_text.THEORY3_1_1,
+                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                                   resize_keyboard=True))
 
-            elif update.message.text != 'Практика' and context.user_data['sort'] == 'Практика':
 
-                if text == "Умножения двоичных чисел" or text == 'Практика по теме' and context.user_data['practice'] == 'Практика умножение двоичных чисел':
 
-                    context.user_data['sort'] = 'Теория'
+            elif update.message.text != 'Практика' and context.user_data['sort'] == 'Практика' or\
+                    check_practice and context.user_data['practice'] == f'Практика{1 or 2 or 3}':
+
+                if text == 'Назад':
+                    do_start(update=update, context=context)
+                    return
+
+                if text == "Умножения двоичных чисел" or text == 'Практика по теме' and context.user_data[
+                    'practice'] == 'Практика умножение двоичных чисел' or check_practice and context.user_data['practice'] == 'Практика1':
                     keyboard = [
                         ["Назад"]
                     ]
-                    update.message.reply_text(text='Это практика',
-                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                               resize_keyboard=True))
+                    try:
+                        if check_practice and context.user_data['practice'] == 'Практика1':
+                            if text != str(context.user_data['first_number'] * context.user_data['second_number']):
+                                update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                return
+                            else:
+                                update.message.reply_text(text=f'Правильно, двигаемся дальше!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                        else:
+                            update.message.reply_text(text=f'Привет, давай поупражняемся!',
+                                                      reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                       resize_keyboard=True))
+                    except Exception as ex:
+                        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
 
-                elif text == "Возведение в квадрат":
 
                     context.user_data['sort'] = 'Практика'
-                    keyboard = [
-                        ["Умножения двоичных чисел"],
-                        ["Возведение в квадрат"],
-                        ["Квадратные уравнения"]
-                    ]
-                    update.message.reply_text(text='Выберите тему',
+                    context.user_data['practice'] = 'Практика1'
+
+                    first_number = context.user_data['first_number'] = random.randint(10, 99)
+                    second_number = context.user_data['second_number'] = random.randint(10, 99)
+                    print(f'\033[32m{first_number*second_number}')
+
+                    update.message.reply_text(text=f'{first_number} * {second_number}',
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
-                elif text == "Квадратные уравнения":
+
+                elif text == "Возведение в квадрат" or text == 'Практика по теме' and context.user_data[
+                    'practice'] == 'Практика возведение в квадрат' or check_practice and context.user_data['practice'] == 'Практика2':
+
+                    keyboard = [
+                        ["Назад"]
+                    ]
+                    try:
+                        if check_practice and context.user_data['practice'] == 'Практика2':
+                            if text != str(context.user_data['first_number'] * context.user_data['first_number']):
+                                update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                return
+                            else:
+                                update.message.reply_text(text=f'Правильно, двигаемся дальше!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                        else:
+                            update.message.reply_text(text=f'Привет, давай поупражняемся!',
+                                                      reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                       resize_keyboard=True))
+                    except Exception as ex:
+                        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+
 
                     context.user_data['sort'] = 'Практика'
-                    keyboard = [
-                        ["Умножения двоичных чисел"],
-                        ["Возведение в квадрат"],
-                        ["Квадратные уравнения"]
-                    ]
-                    update.message.reply_text(text='Выберите тему',
+                    context.user_data['practice'] = 'Практика2'
+
+                    first_number = context.user_data['first_number'] = random.randint(10, 99)
+                    print(f'\033[32m{first_number*first_number}')
+
+                    update.message.reply_text(text=f'{first_number} * {first_number}',
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
+
+                elif text == "Квадратные уравнения" or text == 'Практика по теме' and context.user_data[
+                    'practice'] == 'Практика квадратные уравнения' or check_practice and context.user_data['practice'] == 'Практика3':
+
+                    keyboard = [
+                        ["Назад"]
+                    ]
+                    try:
+                        if check_practice and context.user_data['practice'] == 'Практика3':
+                            answer1 = f"{context.user_data['x1']} {context.user_data['x2']}"
+                            answer2 = f"{context.user_data['x2']} {context.user_data['x1']}"
+                            if text != answer1 and text != answer2:
+                                update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                return
+                            else:
+                                update.message.reply_text(text=f'Правильно, двигаемся дальше!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                        else:
+                            update.message.reply_text(text=f'Привет, давай поупражняемся! В ответе записывай корни через пробел в любом порядке',
+                                                      reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                       resize_keyboard=True))
+
+                    except Exception as ex:
+                        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+
+                    context.user_data['sort'] = 'Практика'
+                    context.user_data['practice'] = 'Практика3'
+
+                    while True:
+                        A_coefficient = random.randint(1,2)
+                        B_coefficient = random.randint(-25, 25)
+                        C_coefficient = random.randint(-40, 40)
+                        D = B_coefficient ** 2 - 4 * A_coefficient * C_coefficient
+                        sq_D = D ** 0.5
+                        if D > 0 and sq_D - int(sq_D) == 0.0:
+                            x1_pre = (-1 * B_coefficient + sq_D) / (2 * A_coefficient)
+                            x2_pre = (-1 * B_coefficient - sq_D) / (2 * A_coefficient)
+                            if abs(x1_pre) - abs(int(x1_pre)) == 0.0 and abs(x2_pre) - abs(int(x2_pre)) == 0.0:
+                                x1 = context.user_data['x1'] = int(x1_pre)
+                                x2 = context.user_data['x2'] = int(x2_pre)
+                                print(f'\033[32m{x1, x2}')
+                                break
+
+                    mes_text = f'Найдите корни уравнения: {A_coefficient if A_coefficient == 2 else ""}x^2 ' \
+                           f'{"-" if B_coefficient < 0 else "+"} {abs(B_coefficient)}x {"-" if C_coefficient < 0 else "+"}' \
+                           f' {abs(C_coefficient)}'
+                    update.message.reply_text(text=mes_text,reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                         resize_keyboard=True))
+
     except Exception as ex:
         print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
 
