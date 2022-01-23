@@ -1,7 +1,4 @@
 import random
-
-import telegram
-
 from settings import TOKEN
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackContext, CallbackQueryHandler
@@ -25,20 +22,20 @@ def main():
     # start_handler = CommandHandler('start', do_start)
     # help_handler = CommandHandler('help', do_help)
     keyboard_handler = MessageHandler(Filters.text, keyboard_value)
-    photo_handler = MessageHandler(Filters.photo, do_photo)
+    # photo_handler = MessageHandler(Filters.photo, do_poto)
 
     dispatcher.add_handler(handler)
     dispatcher.add_handler(keyboard_handler)
-    dispatcher.add_handler(photo_handler)
+    # dispatcher.add_handler(photo_handler)
 
     updater.start_polling()
     updater.idle()
 
-def do_photo(update: Update, context):
-    print('a')
-    # idp = update.message.photo.file_id
-    # print(idp)
-    update.message.reply_photo(open('4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
+# def do_photo(update: Update, context):
+#     print('a')
+#     # idp = update.message.photo.file_id
+#     # print(idp)
+#     update.message.reply_photo(open('theory_photo_dir/4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
 
 def do_start(update, context):
 
@@ -106,9 +103,9 @@ def keyboard_value(update: Update, context):
 
             if update.message.text != 'Теория' and context.user_data['sort'] == 'Теория':
 
-                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[2]':
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[3]':
 
-                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[3]'
+                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[4]'
                     context.user_data['back'] = 'назад теория'
                     context.user_data['practice'] = 'Практика умножение двоичных чисел'
                     context.user_data['sort'] = 'Практика'
@@ -120,6 +117,18 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY1_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
+                if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[2]':
+
+                    context.user_data[context.user_data['sort']] = 'Умножения двоичных чисел[3]'
+
+                    keyboard = [
+                        ["Далее"]
+                    ]
+
+                    update.message.reply_text(text=theory_text.THEORY1_2_2,
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-28.jpg', 'rb'))
 
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Умножения двоичных чисел[1]':
 
@@ -131,9 +140,8 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY1_2_1,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
-                    update.message.reply_text(text=theory_text.THEORY1_2_2,
-                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                               resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-26.jpg', 'rb'))
+
 
                 if text == "Умножения двоичных чисел":
 
@@ -170,9 +178,7 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY2_6_2,
                                                                   reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                                    resize_keyboard=True))
-                    update.message.reply_text(text=theory_text.THEORY2_6_3,
-                                                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                                                   resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-33.jpg', 'rb'))
 
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[4]':
 
@@ -190,9 +196,7 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY2_5_2,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
-                    update.message.reply_text(text=theory_text.THEORY2_5_3,
-                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                               resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-31.jpg', 'rb'))
 
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[3]':
 
@@ -210,9 +214,8 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY2_4_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
-                    update.message.reply_text(text=theory_text.THEORY2_4_4,
-                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                               resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-29.jpg', 'rb'))
+
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[2]':
 
                     context.user_data[context.user_data['sort']] = 'Возведение в квадрат[3]'
@@ -223,9 +226,8 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY2_3,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
-                    update.message.reply_text(text=theory_text.THEORY2_3_2,
-                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
-                                                                               resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-35.jpg', 'rb'))
+
                 if text == "Далее" and context.user_data[context.user_data['sort']] == 'Возведение в квадрат[1]':
 
                     context.user_data[context.user_data['sort']] = 'Возведение в квадрат[2]'
@@ -236,6 +238,7 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY2_2,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                resize_keyboard=True))
+                    update.message.reply_photo(open('theory_photo_dir/photo_2022-01-23_21-29-37.jpg', 'rb'))
 
                 if text == "Возведение в квадрат":
 
@@ -248,7 +251,7 @@ def keyboard_value(update: Update, context):
                         ['Назад']
                     ]
 
-                    update.message.reply_photo(open('4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
+                    update.message.reply_photo(open('theory_photo_dir/4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
 
                     update.message.reply_text(text=theory_text.THEORY2_1,
                                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
@@ -271,7 +274,7 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY3_3_1,
                                                                   reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                                    resize_keyboard=True))
-                    update.message.reply_photo(open('slide-9.jpg', 'rb'))
+                    update.message.reply_photo(open('theory_photo_dir/slide-9.jpg', 'rb'))
                     update.message.reply_text(text=theory_text.THEORY3_3_3,
                                                                   reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                                    resize_keyboard=True))
@@ -301,7 +304,7 @@ def keyboard_value(update: Update, context):
                     update.message.reply_text(text=theory_text.THEORY3_2_1,
                                                                   reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                                    resize_keyboard=True))
-                    update.message.reply_photo(open('diskriminant-i-korni-kvadratnogo-uravneniya.png', 'rb'))
+                    update.message.reply_photo(open('theory_photo_dir/diskriminant-i-korni-kvadratnogo-uravneniya.png', 'rb'))
                     update.message.reply_text(text=theory_text.THEORY3_2_3,
                                                                   reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                                    resize_keyboard=True))
