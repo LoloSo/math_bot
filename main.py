@@ -12,6 +12,11 @@ from operator import itemgetter
 wb = load_workbook('database.xlsx')
 vendor = wb['users']
 
+keyboard = [
+    ["Теория"],
+    ["Практика"],
+    ['Узнать статистику', 'Сообщить о проблеме']
+]
 
 def main():
 
@@ -19,15 +24,12 @@ def main():
     dispatcher = updater.dispatcher
 
     handler = MessageHandler(Filters.command, do_command)
-
-    # start_handler = CommandHandler('start', do_start)
-    # help_handler = CommandHandler('help', do_help)
     keyboard_handler = MessageHandler(Filters.text, keyboard_value)
-    # photo_handler = MessageHandler(Filters.photo, do_poto)
+
 
     dispatcher.add_handler(handler)
     dispatcher.add_handler(keyboard_handler)
-    # dispatcher.add_handler(photo_handler)
+
 
     updater.start_polling()
     updater.idle()
@@ -463,10 +465,12 @@ def keyboard_value(update: Update, context):
                                                                                          resize_keyboard=True))
 
     except Exception as ex:
-        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+        # print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+        pass
 
 def do_command(update, context: CallbackContext):
     if update.message.text == '/start':
+        print(f'\033[32m{update.message.from_user.first_name} {update.message.from_user.last_name} подключился!')
         do_start(update, context)
         return
 
