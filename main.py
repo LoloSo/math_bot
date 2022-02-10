@@ -7,6 +7,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from sys import exc_info
 from traceback import extract_tb
 import theory_text
+from operator import itemgetter
 
 wb = load_workbook('database.xlsx')
 vendor = wb['users']
@@ -31,32 +32,18 @@ def main():
     updater.start_polling()
     updater.idle()
 
-# def do_photo(update: Update, context):
-#     print('a')
-#     # idp = update.message.photo.file_id
-#     # print(idp)
-#     update.message.reply_photo(open('theory_photo_dir/4bedf30c2410ab76334d86f35aaf689c (1).png', 'rb'))
 
 def do_start(update, context):
 
     keyboard = [
         ["Теория"],
         ["Практика"],
-        ['Сообщить о проблеме']
+        ['Узнать статистику', 'Сообщить о проблеме']
     ]
 
     update.message.reply_text(text='Добро пожаловать, выберите, что бы вы хотели сделать.',
                               reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
-def menu(update, context):
-
-    keyboard = [
-        ["Теория"],
-        ["Практика"]
-    ]
-
-    update.message.reply_text(text='Выберите, что бы вы хотели сделать.',
-                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
 
 def keyboard_value(update: Update, context):
     text = update.message.text
@@ -70,7 +57,15 @@ def keyboard_value(update: Update, context):
         if text == 'Назад':
             context.user_data['sort'] = None
             context.user_data['practice'] = None
-            menu(update=update, context=context)
+            do_start(update=update, context=context)
+            return
+
+        if text == 'Топ-5 пользователей':
+            do_show_top_statistic(update=update, context=context)
+
+        if text == 'Узнать статистику':
+            user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+            do_show_statistic(name=user_name, update=update, context=context)
             return
 
         if text == 'Сообщить о проблеме':
@@ -349,10 +344,14 @@ def keyboard_value(update: Update, context):
                             if text != str(context.user_data['first_number'] * context.user_data['second_number']):
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся!',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
@@ -384,10 +383,14 @@ def keyboard_value(update: Update, context):
                             if text != str(context.user_data['first_number'] * context.user_data['first_number']):
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся!',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
@@ -419,10 +422,14 @@ def keyboard_value(update: Update, context):
                             if text != answer1 and text != answer2:
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся! В ответ запиши корни через пробел в любом порядке',
                                                       reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
@@ -520,6 +527,79 @@ def do_words(update: Update, context: CallbackContext):
     context.user_data['command'] = None
     return context.user_data['command']
 
+
+def do_statistic(name, t_ans = False, f_ans = False):
+
+    if t_ans:
+
+        for i in range(2, 100):
+
+            if vendor.cell(column=5, row=i).value == name:
+                user_val = int(vendor.cell(column=6, row=i).value) if vendor.cell(column=6,
+                                                                                  row=i).value is not None else 0
+                vendor.cell(column=6, row=i).value = user_val + 1
+                break
+        else:
+            for j in range(2, 100):
+                if vendor.cell(column=5, row=j).value is None:
+                    vendor.cell(column=5, row=j).value = name
+                    vendor.cell(column=6, row=j).value = 1
+                    break
+    if f_ans:
+
+        for i in range(2, 100):
+
+            if vendor.cell(column=5, row=i).value == name:
+                user_val = int(vendor.cell(column=7, row=i).value) if vendor.cell(column=7,
+                                                                                  row=i).value is not None else 0
+                vendor.cell(column=7, row=i).value = user_val + 1
+                break
+        else:
+            for j in range(2, 100):
+                if vendor.cell(column=5, row=j).value is None:
+                    vendor.cell(column=5, row=j).value = name
+                    vendor.cell(column=7, row=j).value = 1
+                    break
+
+    return wb.save('database.xlsx')
+
+
+def do_show_top_statistic(update: Update, context):
+    top_list = []
+
+    for i in range(2, 100):
+
+        if vendor.cell(column=5, row=i).value is not None:
+            user_val_t = int(vendor.cell(column=6, row=i).value) if vendor.cell(column=6, row=i).value is not None else 0
+            user_list = [vendor.cell(column=5, row=i).value, user_val_t, vendor.cell(column=7, row=i).value]
+            top_list.append(user_list)
+            print(vendor.cell(column=5, row=i).value)
+    sorted_top_list = sorted(top_list, key=itemgetter(1), reverse=True)
+    print(sorted_top_list)
+
+    update.message.reply_text(
+        text='\n'.join(*sorted_top_list))
+
+def do_show_statistic(name, update: Update, context):
+
+    # keyboard = [
+    #     ['Назад']
+    # ]
+
+    for i in range(2, 100):
+
+        if vendor.cell(column=5, row=i).value == name:
+            t_ans = vendor.cell(column=6, row=i).value if vendor.cell(column=6, row=i).value is not None else 0
+            f_ans = vendor.cell(column=7, row=i).value if vendor.cell(column=7, row=i).value is not None else 0
+            update.message.reply_text(
+                text=f'Статистика {name}\nПравильных ответов: {t_ans}\nНеправильный ответов: {f_ans}',
+                reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                 resize_keyboard=True))
+            break
+    else:
+        update.message.reply_text(text='Прости, но я не нашел тебя в списке пользователей(',
+                                  reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                   resize_keyboard=True))
 
 def do_add_vendor(update: Update, context):
 
