@@ -87,9 +87,8 @@ def keyboard_value(update: Update, context):
         elif text == "Практика":
             context.user_data['sort'] = 'Практика'
             keyboard = [
-                ["Умножения двоичных чисел"],
-                ["Возведение в квадрат"],
-                ["Квадратные уравнения"],
+                ["Умножения двоичных чисел", "Возведение в квадрат"],
+                ["Квадратные уравнения", "Поиск процента"],
                 ["Назад"]
             ]
             update.message.reply_text(text='Выберите тему',reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True))
@@ -330,7 +329,7 @@ def keyboard_value(update: Update, context):
 
 
             elif update.message.text != 'Практика' and context.user_data['sort'] == 'Практика' or\
-                    check_practice and context.user_data['practice'] == f'Практика{1 or 2 or 3}':
+                    check_practice and context.user_data['practice'] == f'Практика{1 or 2 or 3 or 4}':
 
                 if text == 'Назад':
                     do_start(update=update, context=context)
@@ -366,7 +365,7 @@ def keyboard_value(update: Update, context):
                     context.user_data['practice'] = 'Практика1'
 
                     first_number = context.user_data['first_number'] = random.randint(10, 99)
-                    second_number = context.user_data['second_number'] = random.randint(10, 99)
+                    second_number = context.user_data['second_number'] = random.randint(first_number-3, first_number+3)
                     print(f'\033[32m{first_number*second_number}')
 
                     update.message.reply_text(text=f'{first_number} * {second_number}',
@@ -460,9 +459,56 @@ def keyboard_value(update: Update, context):
 
                     mes_text = f'Найдите корни уравнения: {A_coefficient if A_coefficient == 2 else ""}x^2 ' \
                            f'{"-" if B_coefficient < 0 else "+"} {abs(B_coefficient)}x {"-" if C_coefficient < 0 else "+"}' \
-                           f' {abs(C_coefficient)}'
+                           f' {abs(C_coefficient)} = 0'
                     update.message.reply_text(text=mes_text,reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
                                                                                          resize_keyboard=True))
+
+                elif text == "Поиск процента" or text == 'Практика по теме' and context.user_data[
+                    'practice'] == 'Поиск процента' or check_practice and context.user_data['practice'] == 'Практика4':
+
+                    keyboard = [
+                        ["Назад"]
+                    ]
+                    try:
+                        if check_practice and context.user_data['practice'] == 'Практика4':
+                            if text != str(context.user_data['answer_fs']):
+                                update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(f_ans=True, name=user_name)
+                                return
+                            else:
+                                update.message.reply_text(text=f'Правильно, двигаемся дальше!',
+                                    reply_markup=ReplyKeyboardMarkup(keyboard,one_time_keyboard=True,resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
+                                do_statistic(t_ans=True, name=user_name)
+                        else:
+                            update.message.reply_text(text=f'Итак, давай поупражняемся! Не целые числа пишутся с точкой и округляются до десятых',
+                                                      reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                                       resize_keyboard=True))
+                    except Exception as ex:
+                        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+
+
+                    context.user_data['sort'] = 'Практика'
+                    context.user_data['practice'] = 'Практика4'
+
+                    while True:
+                        first_number = context.user_data['first_number'] = random.randint(10, 1000)
+                        second_number = context.user_data['first_number'] = random.randint(5, 100)
+                        if first_number % 5 == 0 and second_number % 5 == 0:
+                            answer_fs = first_number * (second_number / 100)
+                            if answer_fs - int(answer_fs) == 0.0:
+                                context.user_data['answer_fs'] = round(int(answer_fs), 1)
+                            else:
+                                context.user_data['answer_fs'] = round(answer_fs, 1)
+                            break
+
+                    print(f'\033[32m{context.user_data["answer_fs"]}')
+
+                    update.message.reply_text(text=f'Найдите {second_number} процентов от {first_number}',
+                                              reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
 
     except Exception as ex:
         # print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
@@ -471,6 +517,7 @@ def keyboard_value(update: Update, context):
 def do_command(update, context: CallbackContext):
     if update.message.text == '/start':
         print(f'\033[32m{update.message.from_user.first_name} {update.message.from_user.last_name} подключился!')
+        print(update.message.from_user.id)
         do_start(update, context)
         return
 
@@ -613,6 +660,7 @@ def do_add_vendor(update: Update, context):
             vendor.cell(column=1, row=i).value = update.message.text
             vendor.cell(column=2, row=i).value = f'{update.message.from_user.first_name} {update.message.from_user.last_name}'
             update.message.reply_text(text='Большое спасибо, мы это исправим!')
+            update.message.reply_text(reply_to_message_id='3447', text=f'{update.message.from_user.first_name} {update.message.from_user.last_name}: {update.message.text}')
             break
 
     return wb.save('database.xlsx')
