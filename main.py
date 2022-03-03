@@ -52,11 +52,16 @@ def keyboard_value(update: Update, context):
             do_start(update=update, context=context)
             return
 
+        if text == 'Узнать статистику':
+            update.message.reply_text(text='Выберите, чтобы вы хотели сделать',
+                                      reply_markup=ReplyKeyboardMarkup(settings.keyboard_main_statistics,
+                                                                       one_time_keyboard=True, resize_keyboard=True))
+
         if text == 'Топ-5 пользователей':
             do_show_top_statistic(update=update, context=context)
 
-        if text == 'Узнать статистику':
-            user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+        if text == 'Узнать свою статистику':
+            user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
             do_show_statistic(name=user_name, update=update, context=context)
             return
 
@@ -259,7 +264,7 @@ def keyboard_value(update: Update, context):
                                                                                                    resize_keyboard=True))
 
             elif update.message.text != 'Практика' and context.user_data['sort'] == 'Практика' or\
-                    check_practice and context.user_data['practice'] == f'Практика{1 or 2 or 3 or 4}':
+                    check_practice and context.user_data['practice'] == f'Практика{1 or 2 or 3 or 4 or 5}':
 
                 if text == 'Назад':
                     do_start(update=update, context=context)
@@ -272,12 +277,12 @@ def keyboard_value(update: Update, context):
                         if check_practice and context.user_data['practice'] == 'Практика1':
                             if text != str(context.user_data['first_number'] * context.user_data['second_number']):
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся!')
@@ -304,12 +309,12 @@ def keyboard_value(update: Update, context):
                         if check_practice and context.user_data['practice'] == 'Практика2':
                             if text != str(context.user_data['first_number'] * context.user_data['first_number']):
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся!')
@@ -336,12 +341,12 @@ def keyboard_value(update: Update, context):
                             answer2 = f"{context.user_data['x2']} {context.user_data['x1']}"
                             if text != answer1 and text != answer2:
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!')
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся! В ответ запиши корни через пробел в любом порядке')
@@ -381,13 +386,13 @@ def keyboard_value(update: Update, context):
                             if text != str(context.user_data['answer_fs']):
                                 update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
                                     reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice, one_time_keyboard=True,resize_keyboard=True))
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(f_ans=True, name=user_name)
                                 return
                             else:
                                 update.message.reply_text(text=f'Правильно, двигаемся дальше!',
                                     reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice,one_time_keyboard=True,resize_keyboard=True))
-                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username}'
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
                                 do_statistic(t_ans=True, name=user_name)
                         else:
                             update.message.reply_text(text=f'Итак, давай поупражняемся! Не целые числа пишутся с точкой и округляются до десятых в потолок [x + 0.05]',
@@ -411,10 +416,58 @@ def keyboard_value(update: Update, context):
                                 context.user_data['answer_fs'] = round(answer_fs, 1)
                             break
 
-                    print(f'\033[35mAnswer: {context.user_data["answer_fs"]}')
+                    print(f'\033[35mAnswer for {update.message.from_user.first_name} in find proc: {context.user_data["answer_fs"]}')
 
                     update.message.reply_text(text=f'Найдите {second_number} процентов от {first_number}',
                                               reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice, one_time_keyboard=True,
+                                                                               resize_keyboard=True))
+
+                elif text == "Поиск квадратного корня" or text == 'Практика по теме' and context.user_data[
+                    'practice'] == 'Поиск квадратного корня' or check_practice and context.user_data['practice'] == 'Практика5':
+
+                    try:
+                        if check_practice and context.user_data['practice'] == 'Практика5':
+                            if text != str(context.user_data['answer_fs']):
+                                update.message.reply_text(text=f'Неправильно, попробуйте ещё раз!',
+                                                          reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice,
+                                                                                           one_time_keyboard=True,
+                                                                                           resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
+                                do_statistic(f_ans=True, name=user_name)
+                                return
+                            else:
+                                update.message.reply_text(text=f'Правильно, двигаемся дальше!',
+                                                          reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice,
+                                                                                           one_time_keyboard=True,
+                                                                                           resize_keyboard=True))
+                                user_name = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
+                                do_statistic(t_ans=True, name=user_name)
+                        else:
+                            update.message.reply_text(
+                                text=f'Итак, давай поупражняемся!',
+                                reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice, one_time_keyboard=True,
+                                                                 resize_keyboard=True))
+                    except Exception as ex:
+                        print('\033[31mLine: ', extract_tb(exc_info()[2])[0][1], '\nException: ', ex)
+
+                    context.user_data['sort'] = 'Практика'
+                    context.user_data['practice'] = 'Практика5'
+
+                    while True:
+                        first_number = context.user_data['first_number'] = random.randint(10, 1000)
+
+                        if first_number % first_number ** 0.5 == 0:
+                            answer_fs = int(first_number ** 0.5)
+                            if answer_fs - int(answer_fs) == 0.0:
+                                context.user_data['answer_fs'] = answer_fs
+                                break
+
+                    print(
+                        f'\033[35mAnswer for {update.message.from_user.first_name} in find sqr: {context.user_data["answer_fs"]}')
+
+                    update.message.reply_text(text=f'Найдите корень от {first_number}',
+                                              reply_markup=ReplyKeyboardMarkup(settings.keyboard_practice,
+                                                                               one_time_keyboard=True,
                                                                                resize_keyboard=True))
 
     except Exception as ex:
@@ -425,7 +478,7 @@ def do_command(update, context: CallbackContext):
     if update.message.text == '/start':
         current_datetime = datetime.now()
         print(f'\033[32m{str(current_datetime.time()).split(".")[0]}:'
-              f' {update.message.from_user.first_name} @{update.message.from_user.username} {update.message.from_user.id} подключился')
+              f' {update.message.from_user.first_name} @{update.message.from_user.username if update.message.from_user.username is not None else None} {update.message.from_user.id} подключился')
         do_start(update, context)
         return
 
@@ -525,19 +578,29 @@ def do_statistic(name, t_ans = False, f_ans = False):
 
 def do_show_top_statistic(update: Update, context):
     top_list = []
+    end_top_list = []
+    pre_end_top = []
 
     for i in range(2, 100):
-
         if vendor.cell(column=5, row=i).value is not None:
             user_val_t = int(vendor.cell(column=6, row=i).value) if vendor.cell(column=6, row=i).value is not None else 0
-            user_list = [vendor.cell(column=5, row=i).value, user_val_t, vendor.cell(column=7, row=i).value]
-            top_list.append(user_list)
-            print(vendor.cell(column=5, row=i).value)
-    sorted_top_list = sorted(top_list, key=itemgetter(1), reverse=True)
-    print(sorted_top_list)
+            user_val_f = vendor.cell(column=7, row=i).value if vendor.cell(column=7, row=i).value is not None else 0
+            user_str = [vendor.cell(column=5, row=i).value, user_val_t, user_val_f]
+            top_list.append(user_str)
 
-    update.message.reply_text(
-        text='\n'.join(*sorted_top_list))
+    sorted_top_list = sorted(top_list, key=itemgetter(1), reverse=True)
+
+    for etter in sorted_top_list:
+        pre_end_top.append(f'{etter[0]}  -  П: {etter[1]} Н: {etter[2]}')
+
+    if len(pre_end_top) > 5:
+        pre_end_top = pre_end_top[0:5]
+
+    for l in range(1, len(pre_end_top)+1):
+        end_top_list.append(f'\n{l}. ' + pre_end_top[l-1])
+
+    update.message.reply_text(text=f'Топ-5 пользователей:{"".join(end_top_list)}',
+                reply_markup=ReplyKeyboardMarkup(settings.keyboard_home, one_time_keyboard=True, resize_keyboard=True))
 
 def do_show_statistic(name, update: Update, context):
 
@@ -562,14 +625,17 @@ def do_add_vendor(update: Update, context: CallbackContext):
 
         if vendor.cell(column=1, row=i).value is None:
             vendor.cell(column=1, row=i).value = update.message.text
-            vendor.cell(column=2, row=i).value = f'{update.message.from_user.first_name} @{update.message.from_user.username}'
-            update.message.reply_text(text='Большое спасибо, мы это исправим!')
+            vendor.cell(column=2, row=i).value = f'{update.message.from_user.first_name} {update.message.from_user.username if update.message.from_user.username is not None else None}'
+            update.message.reply_text(text='Большое спасибо, мы это исправим!',
+                                  reply_markup=ReplyKeyboardMarkup(settings.keyboard_home, one_time_keyboard=True,
+                                                                   resize_keyboard=True))
             current_datetime = datetime.now()
             update.message.bot.send_message(chat_id=settings.main_user_id, text=f'{update.message.from_user.first_name} @{update.message.from_user.username} сообщил о проблеме:\n{update.message.text}')
             print(f'\033[31m{str(current_datetime.time()).split(".")[0]}: {update.message.from_user.first_name} @{update.message.from_user.username} сообщил о проблеме')
+            context.user_data['command'] = None
             break
 
-    return wb.save('database.xlsx')
+    return wb.save('database.xlsx'), context.user_data['command']
 
 
 def do_delete_vendor(update: Update, context):
